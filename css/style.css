@@ -1,0 +1,248 @@
+/* apply a natural box layout model to all elements, but allowing components to change */
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+/* Page layout */
+html {
+  height: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  background-color: ghostwhite;
+}
+body {
+  min-height: 100%;
+  background-color: white;
+  padding: 1em;
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.25);
+}
+
+/* General styles */
+.wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+#pop-up {
+  position: fixed;
+  top: 30px;
+  left: 30px;
+  right: 30px;
+  bottom: 30px;
+  border: 1px solid gray;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+#pop-up.loader {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: none;
+  background-color: rgba(255,255,255,0.9);
+  background-image: url(../images/ajax_loader.gif);
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+#pop-up .close-pop-up {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 40px;
+  color: #FE052C;
+  text-decoration: none;
+}
+
+#pop-up .wrapper {
+  margin-top: 80px;
+  margin-bottom: 40px;
+}
+
+#pop-up h1 {
+  margin-bottom: 0;
+}
+
+#pop-up .pop-up-action {
+  padding: 10px;
+  background-color: #FE052C;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  transform: 0.2s all;
+  margin-top: 30px;
+  display: inline-block;
+}
+
+#pop-up .pop-up-action:hover {
+  color: #FE052C;
+  background: #fff;
+}
+
+/* Header styles */
+header {
+  background-color: #FE052C;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+header h1 {
+  color: #FFF;
+  padding: 10px 2%;
+  margin: 0;
+  width: 16%;
+  float: left;
+  padding-left: 0;
+}
+
+/* Header navigation bar */
+header nav {
+  padding: 10px 0;
+  width: 76%;
+  float: right;
+  text-align: right;
+  line-height: 30px;
+  margin-top: 0;
+  position: relative;
+  vertical-align: middle;
+}
+
+/* Search bar */
+header #search {
+  float: right;
+  line-height: 0; /* Kill trailing whitespace */
+}
+
+header #search #search-icon {
+  display: inline-block;
+  padding: 10px;
+}
+
+header #search img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+header #search input {
+  border: none;
+  width: 300px;
+  padding: 0 12px;
+  font-size: 16px;
+  line-height: 40px;
+  transition: 0.2s all;
+  vertical-align: top;
+}
+
+header nav a {
+  display:block;
+  padding:0 10px;
+  color:#FFF;
+  font-size:16px;
+  line-height: 40px;
+  text-decoration:none;
+  transition: 0.2s all;
+}
+
+header nav a:hover {
+  background-color: #fff;
+  color: #CC0020;
+}
+
+nav ul {
+  float: right;
+  padding:0;
+  margin:0;
+  margin-right: 10px;
+  list-style: none;
+  position: relative;
+  }
+
+nav ul li {
+  display:inline-block;
+  background-color: #CC0020;
+  position: relative;
+}
+
+nav ul ul {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  margin-right: 0;
+}
+
+/* Display Dropdowns on Hover */
+nav ul li:hover > ul {
+  display:inherit;
+}
+
+/* First Tier Dropdown */
+nav ul ul li {
+  width:170px;
+  float:none;
+  display:list-item;
+  position: relative;
+}
+
+/* Main Section */
+#main {
+  margin-top: 65px;
+}
+
+/* Individual Article Styling */
+.article {
+  border-bottom: 1px solid #ccc;
+  transition: 0.2s all;
+}
+
+.article:hover {
+  padding: 0 0.5%;
+  background-color: #eee;
+}
+
+.article .featured-image {
+  width: 12%;
+  float: left;
+  margin: 1.5%;
+  max-width: 60px;
+}
+
+.article .featured-image img {
+  max-width: 100%;
+  border-radius: 50px;
+}
+
+.article .article-content {
+  width: 70%;
+  float: left;
+}
+
+.article .article-content a {
+  text-decoration: none;
+}
+
+.article .article-content h3 {
+  margin-bottom: 0;
+  color: #FE052C;
+}
+
+.article .article-content h6 {
+  margin-top: 0;
+  color: #666;
+}
+
+.article .impressions {
+  width: 15%;
+  float: right;
+  font-size: 30px;
+  margin-top: 15px;
+  text-align: right;
+  color: #097FB2;
+}
