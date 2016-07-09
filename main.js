@@ -8,73 +8,155 @@
 
 ;(function () {
   var container = document.querySelector('#container')
-  var state = {
-    items: [
-      {title: 'this', link: 'http://localhost:3000', imageUrl: 'http://fillmurray.com/100/100'},
-      {title: 'that', link: 'http://localhost:3000', imageUrl: 'http://fillmurray.com/100/100'},
-      {title: 'other', link: 'http://localhost:3000', imageUrl: 'http://fillmurray.com/100/100'}
-    ]
-  }
+  var state = {}
 
   var menuEl = document.querySelector('#menu')
   var entriesEl = document.querySelector('#entries')
+  var header = document.querySelector('header')
+  var redditTopic = 'cats'
 
+// Fetch subreddit urls
   function fetchSubreddit (url) {
     if (url) {
-      fetch('https://www.reddit.com/r/' + url + '.json')
+      fetch(url)
         .then((response) => {
           return response.json()
         })
         .then((json) => {
-          console.log(json)
-          var links = ''
-          for (var i = 0; i < json.data.children.length; i++) {
-            links += '<li><a href="' + json.data.children[i].data.url + '">' +
-              json.data.children[i].data.url + '</a></li>'
-          }
-          entriesEl.innerHTML = '<ul>' + links + '</ul>'
+          state.postData = json.data.children.map((item, index) => {
+            let obj = {}
+            obj.postTitle = item.data.title
+            obj.postBody = item.data.selftext
+            obj.score = item.data.score
+            obj.author = item.data.author
+            obj.postId = index
+            return obj
+          })
+          console.log('state object')
+          console.log(state)
+          renderList(state.postData, container)
+          // console.log('from fetchSubreddit: ')
+          // console.log(state.postData)
+        })
+        .catch((err) => {
+          console.log('there\'s been a problem', err)
         })
     }
   }
 
-  var subredditsByTopicUrl = 'https://www.reddit.com/api/subreddits_by_topic.json?query=javascript'
+  // function  getStuff(eventName) {
+  //   return stuff === eventName
+  // }
+
+  function findObject (id, resolve) {
+    state.items.forEach((obj) => {
+      var key = Object.keys(obj).filter((key) => {
+        if (obj[key] === id) {
+          resolve(obj)
+        }
+      })[0]
+    })
+  }
+
+  delegate('body', 'click', 'ul.dropdown li a', function (event) {
+    var thisUrl = (val) => {
+      // Find relveant feed URL
+      state.feedData.forEach((item) => {
+        if (item.feedTitle === event.delegateTarget.dataset.category) {
+          val = item.feedUrl
+        }
+      })
+      return val
+    }
+    fetchSubreddit(thisUrl())
+  })
+
+  delegate('body', 'click', '.article-content a', function (event) {
+    state.feedData.forEach((obj) => {
+      Object.keys(obj).filter(function(key) {
+        if (obj[key] === id) {
+
+        }
+    })
+    renderPopup(data, container)
+  })
+
+// TODO: Grab subreddit categories
+  var subredditsByTopicUrl = 'https://www.reddit.com/api/subreddits_by_topic.json?query=' + redditTopic
   fetch(subredditsByTopicUrl)
     .then(function (response) {
       return response.json()
     })
     .then(function (json) {
-      var select = document.createElement('select')
-      var links = ''
-      for (var k = 0; k < json.length; k++) {
-        links += '<option value="' + json[k].name + '">' + json[k].name +
-          '</option>'
-      }
-      select.innerHTML = links
-      select.addEventListener('change', function (e) {
-        fetchSubreddit(e.target.value)
+      state.feedData = []
+      state.feedData = json.map((item) => {
+        var obj = {}
+        obj.feedTitle = item.name
+        obj.feedUrl = 'https://www.reddit.com/r/' + item.name + '.json'
+        return obj
       })
-      menuEl.appendChild(select)
-    }).catch(function (err) {
+      // console.log('state.feedData')
+      // console.log(state.feedData)
+      renderHeader(state, header)
+    })
+    .catch(function (err) {
       console.log('something went wrong:' + err)
     })
 
-  // renderLoading(state, container)
+    function renderHeader (state, into) {
+      into.innerHTML = `
+      <section class="wrapper">
+        <a href="#"><h1>Feedr</h1></a>
+        <nav>
+          <section id="search">
+            <input type="text" name="name" value="">
+            <div id="search-icon"><img src="images/search.png" alt="" /></div>
+          </section>
+          <ul>
+            <li><a href="#">News Source: <span>Source Name</span></a>
+            <ul class="dropdown">
+              ${state.feedData.map((item) => {
+                return `<li>${renderItem(item.feedTitle)}</li>`
+              }).join('')}
+            </ul>
+            </ul>
+            </li>
+          </ul>
+        </nav>
+        <div class="clearfix"></div>
+      </section>
+      `
+    }
 
-  // function renderLoading (data, into) {
-  //   `<div id="pop-up" class="loader">${thing}</div>`
-  // }
+    function renderItem(item) {
+      return `
+        <a href="#" data-category="${item}">${item}</a>
+      `
+    }
 
-  function renderList (state, into) {
+  function renderLoading (data, into) {
+    into.innerHTML = `<div id="pop-up" class="loader"></div>`
+  }
+
+  function renderList (data, into) {
+    // console.log('from renderList ')
+    // console.log(data)
     into.innerHTML = `
     <section id="main" class="wrapper">
-        ${state.items.map((item) => {
+        ${data.map((item) => {
       return `
-            <article class="article">
+            <article class="article" data-id=${item.postId}>
               <section class="featured-image">
                 <img src="${item.imageUrl}" />
               </section>
               <section class="article-content">
-                <a href="${item.link}"> <h3>${item.title}</h3> </a>
+                <a href="#">
+                  <h3>${item.postTitle}</h3>
+                  <h6>${item.author}</h6>
+                </a>
+              </section>
+              <section class="impressions">
+                ${item.score}
               </section>
               <div class="clearfix"></div>
             </article>
@@ -83,5 +165,20 @@
       </section>
       `
   }
-  renderList(state, container)
+  function renderPopup (data, into) {
+    into.innerHTML = `
+    <div id="pop-up">
+      <a href="#" class="close-pop-up">X</a>
+      <div class="wrapper">
+        <h1>${data.postTitle}</h1>
+        <p>
+        ${data.postBody}
+        </p>
+        <a href="#" class="pop-up-action" target="_blank">Read more from source</a>
+      </div>
+    </div>
+    `
+  }
+  fetchSubreddit('https://www.reddit.com/r/cscareerquestions.json')
+  // renderLoading(state, container)
 })()

@@ -30,3 +30,12 @@ https://developer.spotify.com/web-api/
 
 Netflix roulette
 https://market.mashape.com/community/netflix-roulette
+
+
+```
+state.feedData = json.map((item) => {
+  var obj = {}
+  obj.feedTitle = item.name
+  obj.feedUrl = 'https://www.reddit.com/r/' + item.name + '.json'
+  return obj
+```
