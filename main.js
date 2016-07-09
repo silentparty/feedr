@@ -4,31 +4,84 @@
  *
  * See the README.md for instructions
  */
+'use strict'
+
 ;(function () {
   var container = document.querySelector('#container')
-  var state = {}
+  var state = {
+    items: [
+      {title: 'this', link: 'http://localhost:3000', imageUrl: 'http://fillmurray.com/100/100'},
+      {title: 'that', link: 'http://localhost:3000', imageUrl: 'http://fillmurray.com/100/100'},
+      {title: 'other', link: 'http://localhost:3000', imageUrl: 'http://fillmurray.com/100/100'}
+    ]
+  }
 
-  renderLoading(state, container)
+  var menuEl = document.querySelector('#menu')
+  var entriesEl = document.querySelector('#entries')
 
-  fetch('https://crossorigin.me/https://maps.googleapis.com/maps/api/place/textsearch/xml?query=restaurants+in+Sydney&key=AIzaSyCT4WbbETNv8QhLddKci_onB8xcZC1hF1A')
-    .then((response) => {
+  function fetchSubreddit (url) {
+    if (url) {
+      fetch('https://www.reddit.com/r/' + url + '.json')
+        .then((response) => {
+          return response.json()
+        })
+        .then((json) => {
+          console.log(json)
+          var links = ''
+          for (var i = 0; i < json.data.children.length; i++) {
+            links += '<li><a href="' + json.data.children[i].data.url + '">' +
+              json.data.children[i].data.url + '</a></li>'
+          }
+          entriesEl.innerHTML = '<ul>' + links + '</ul>'
+        })
+    }
+  }
+
+  var subredditsByTopicUrl = 'https://www.reddit.com/api/subreddits_by_topic.json?query=javascript'
+  fetch(subredditsByTopicUrl)
+    .then(function (response) {
       return response.json()
     })
-    .then((response) => {
-      console.log(response)
-    })
-    .catch((err) => {
-      console.log('error!', err)
+    .then(function (json) {
+      var select = document.createElement('select')
+      var links = ''
+      for (var k = 0; k < json.length; k++) {
+        links += '<option value="' + json[k].name + '">' + json[k].name +
+          '</option>'
+      }
+      select.innerHTML = links
+      select.addEventListener('change', function (e) {
+        fetchSubreddit(e.target.value)
+      })
+      menuEl.appendChild(select)
+    }).catch(function (err) {
+      console.log('something went wrong:' + err)
     })
 
-  function renderLoading (data, into) {
-    // TODO: Add the template
-    // `<div id="pop-up" class="loader">${thing}</div>`
-  }
+  // renderLoading(state, container)
+
+  // function renderLoading (data, into) {
+  //   `<div id="pop-up" class="loader">${thing}</div>`
+  // }
 
   function renderList (state, into) {
     into.innerHTML = `
-      <div>${state}</div>
-    `
+    <section id="main" class="wrapper">
+        ${state.items.map((item) => {
+      return `
+            <article class="article">
+              <section class="featured-image">
+                <img src="${item.imageUrl}" />
+              </section>
+              <section class="article-content">
+                <a href="${item.link}"> <h3>${item.title}</h3> </a>
+              </section>
+              <div class="clearfix"></div>
+            </article>
+            `
+    }).join('')}
+      </section>
+      `
   }
+  renderList(state, container)
 })()
