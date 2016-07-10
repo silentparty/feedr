@@ -12,7 +12,7 @@
   var state = {}
   var header = document.querySelector('header')
   var redditTopic = 'cats'
-  var imgPlaceholder = './images/article_placeholder_1.jpg'
+  var imgPlaceholder = './images/r_placeholder.png'
   var defaultSubreddit = 'https://www.reddit.com/r/cats.json'
 
 // NOTE:Fetch subreddit urls
@@ -33,7 +33,7 @@
             obj.author = item.data.author
             obj.postId = index
             // TODO: Write a function for the below that looks for a URL in a string. The edge cases for the below could go on forever otherwise, so just look for what's needed.
-            obj.imageThumbUrl = obj.imageThumbUrl = ((item.data.thumbnail === '') || (item.data.thumbnail === 'default') || (item.data.thumbnail === 'self')) ? imgPlaceholder : item.data.thumbnail
+            obj.imageThumbUrl = ((item.data.thumbnail === '') || (item.data.thumbnail === 'default') || (item.data.thumbnail === 'self')) ? imgPlaceholder : item.data.thumbnail
             item.data.preview ? obj.imageUrl = item.data.preview.images[0].source.url : obj.imageUrl = imgPlaceholder
             return obj
           })
@@ -117,6 +117,7 @@
     .catch(function (err) {
       console.log('something went wrong:' + err)
     })
+  // TODO: renderHeader needs to update currentFeed no matter how feed is loaded, not just on click of menu. (like when page inits, for example, there's no click action, so the header doesn't update to show currentFeed)
   function renderHeader (state, into) {
     into.innerHTML = `
       <section class="wrapper">

@@ -51,9 +51,9 @@ body {
 }
 
 #pop-up .close-pop-up {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+  position: fixed;
+  top: 50px;
+  right: 60px;
   font-size: 40px;
   color: #FE052C;
   text-decoration: none;
