@@ -68,6 +68,11 @@ body {
   margin-bottom: 0;
 }
 
+#pop-up img {
+  max-height:600px;
+  max-width: 100%;
+}
+
 #pop-up .pop-up-action {
   padding: 10px;
   background-color: #FE052C;

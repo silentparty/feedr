@@ -13,6 +13,7 @@
   var header = document.querySelector('header')
   var redditTopic = 'cats'
   var imgPlaceholder = './images/article_placeholder_1.jpg'
+  var defaultSubreddit = 'https://www.reddit.com/r/cats.json'
 
 // NOTE:Fetch subreddit urls
   function fetchSubreddit (url) {
@@ -27,11 +28,12 @@
             let obj = {}
             obj.postTitle = item.data.title
             obj.postBody = item.data.selftext
+            obj.postSrcUrl = item.data.url
             obj.score = item.data.score
             obj.author = item.data.author
             obj.postId = index
             obj.imageThumbUrl = item.data.thumbnail || imgPlaceholder
-            obj.imageUrl = item.data.preview || imgPlaceholder
+            item.data.preview ? obj.imageUrl = item.data.preview.images[0].source.url : obj.imageUrl = imgPlaceholder
             return obj
           })
           // console.log('state object')
@@ -61,7 +63,7 @@
   // }
 
   delegate('body', 'click', 'ul.dropdown li a', function (event) {
-    var thisUrl = (val) => {
+    var thisFeedUrl = (val) => {
       // Find relveant feed URL
       state.feedData.forEach((item) => {
         if (item.feedTitle === event.delegateTarget.dataset.category) {
@@ -71,7 +73,7 @@
       })
       return val
     }
-    fetchSubreddit(thisUrl())
+    fetchSubreddit(thisFeedUrl())
     renderHeader(state, header)
   })
 
@@ -199,14 +201,19 @@
     <div id="pop-up">
       <a href="#" class="close-pop-up">X</a>
       <div class="wrapper">
+      <img src="${data.imageUrl}" />
         <h1>${data.postTitle}</h1>
         <p>
         ${data.postBody}
         </p>
-        <a href="#" class="pop-up-action" target="_blank">Read more from source</a>
+        <a href="${data.postSrcUrl}" class="pop-up-action" target="_blank">Read more from source</a>
       </div>
     </div>
     `
   }
-  fetchSubreddit('https://www.reddit.com/r/cscareerquestions.json')
+  // init
+  (() => {
+    fetchSubreddit(defaultSubreddit)
+    renderHeader(state, header)
+  })()
 })()
