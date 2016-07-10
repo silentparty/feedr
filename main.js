@@ -32,7 +32,8 @@
             obj.score = item.data.score
             obj.author = item.data.author
             obj.postId = index
-            obj.imageThumbUrl = item.data.thumbnail || imgPlaceholder
+            // TODO: Write a function for the below that looks for a URL in a string. The edge cases for the below could go on forever otherwise, so just look for what's needed.
+            obj.imageThumbUrl = obj.imageThumbUrl = ((item.data.thumbnail === '') || (item.data.thumbnail === 'default') || (item.data.thumbnail === 'self')) ? imgPlaceholder : item.data.thumbnail
             item.data.preview ? obj.imageUrl = item.data.preview.images[0].source.url : obj.imageUrl = imgPlaceholder
             return obj
           })
@@ -112,7 +113,7 @@
     // })
   })
 
-// TODO: Grab subreddit categories
+// Grab subreddit categories
   var subredditsByTopicUrl = 'https://www.reddit.com/api/subreddits_by_topic.json?query=' + redditTopic
   fetch(subredditsByTopicUrl)
     .then(function (response) {
