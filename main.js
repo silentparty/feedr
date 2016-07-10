@@ -78,15 +78,10 @@
     renderHeader(state, header)
   })
 
-  // TODO: remove getKeyByValue?
-  // function getKeyByValue (obj, val) {
-  //   return Object.keys(obj).find(key => obj[key] === val)
-  // }
-
   delegate('body', 'click', '.article-content a', function (event) {
     event.preventDefault()
-    // TODO: Try using history API to do this stuff
-    // history.pushState('foo', 'bar', '#zip')
+    // TODO: Try using history API to do this stuff ?
+    // i.e. history.pushState('foo', 'bar', '#zip')
     var thisId = parseInt(event.delegateTarget.dataset.id, 10)
     state.postData.forEach((obj) => {
       if (thisId === obj.postId) {
@@ -101,16 +96,6 @@
         document.querySelector('#pop-up').remove()
       }
     })
-    // console.log(getKeyByValue(state.postData[0], thisId))
-    // state.postData.forEach((obj) => {
-    //   Object.keys(obj).filter(function (key) {
-    //     if (obj[key] === parseInt(state.postData.postId)) {
-    //       console.log(obj[key])
-    //       return obj
-    //     }
-    //   })
-      // renderPopup(data, container)
-    // })
   })
 
 // Grab subreddit categories
@@ -127,9 +112,6 @@
         obj.feedUrl = 'https://www.reddit.com/r/' + item.name + '.json'
         return obj
       })
-
-      // console.log('state.feedData')
-      // console.log(state.feedData)
       renderHeader(state, header)
     })
     .catch(function (err) {
