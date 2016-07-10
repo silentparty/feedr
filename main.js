@@ -12,6 +12,7 @@
   var state = {}
   var header = document.querySelector('header')
   var redditTopic = 'cats'
+  var imgPlaceholder = './images/article_placeholder_1.jpg'
 
 // NOTE:Fetch subreddit urls
   function fetchSubreddit (url) {
@@ -29,6 +30,8 @@
             obj.score = item.data.score
             obj.author = item.data.author
             obj.postId = index
+            obj.imageThumbUrl = item.data.thumbnail || imgPlaceholder
+            obj.imageUrl = item.data.preview || imgPlaceholder
             return obj
           })
           // console.log('state object')
@@ -63,11 +66,13 @@
       state.feedData.forEach((item) => {
         if (item.feedTitle === event.delegateTarget.dataset.category) {
           val = item.feedUrl
+          state.feedData.currentFeed = item.feedTitle
         }
       })
       return val
     }
     fetchSubreddit(thisUrl())
+    renderHeader(state, header)
   })
 
   // TODO: remove getKeyByValue?
@@ -137,7 +142,7 @@
             <div id="search-icon"><img src="images/search.png" alt="" /></div>
           </section>
           <ul>
-            <li><a href="#">News Source: <span>Source Name</span></a>
+            <li><a href="#">News Source: <span>${state.feedData.currentFeed}</span></a>
             <ul class="dropdown">
               ${state.feedData.map((item) => {
                 return `<li>${renderItem(item.feedTitle)}</li>`
@@ -171,7 +176,7 @@
           return `
             <article class="article">
               <section class="featured-image">
-                <img src="${item.imageUrl}" />
+                <img src="${item.imageThumbUrl}" />
               </section>
               <section class="article-content">
                 <a href="#" data-id=${item.postId}>
