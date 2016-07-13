@@ -7,7 +7,6 @@
 'use strict'
 
 ;(function () {
-
   let redditTopic = 'cats'
 
   const state = {}
@@ -18,7 +17,7 @@
   const imgPlaceholder = './images/r_placeholder.png'
   const subredditsByTopic = 'https://www.reddit.com/api/subreddits_by_topic.json?query=' + redditTopic
 
-// Fetch subreddit data
+  // Fetch subreddit data
   function fetchSubredditPostData (url) {
     renderLoading(state, container)
     if (url) {
@@ -46,32 +45,32 @@
         })
         .catch((err) => {
           alert('OH NO SOMETHING BROKE')
-          console.error('there\'s been a problem', err)
+          console.error("there's been a problem", err)
         })
     }
   }
-//
-  function fetchSubRedditCategories(url) {
+  //
+  function fetchSubRedditCategories (url) {
     fetch(url)
-    .then(function (response) {
-      return response.json()
-    })
-    .then(function (json) {
-      state.feedData = []
-      state.feedData = json.map((item) => {
-        var obj = {}
-        obj.feedTitle = item.name
-        obj.feedUrl = 'https://www.reddit.com/r/' + item.name + '.json'
-        return obj
+      .then(function (response) {
+        return response.json()
       })
-      state.feedData.selectedFeed = state.feedData[0].feedTitle
-      renderHeader(state, header)
-      fetchSubredditPostData(state.feedData[0].feedUrl)
-    })
-    .catch(function (err) {
-      alert('Failed to fetch initial category list. The server might be down, please try again in a minute or two.')
-      console.error('something went wrong:' + err)
-    })
+      .then(function (json) {
+        state.feedData = []
+        state.feedData = json.map((item) => {
+          var obj = {}
+          obj.feedTitle = item.name
+          obj.feedUrl = 'https://www.reddit.com/r/' + item.name + '.json'
+          return obj
+        })
+        state.feedData.selectedFeed = state.feedData[0].feedTitle
+        renderHeader(state, header)
+        fetchSubredditPostData(state.feedData[0].feedUrl)
+      })
+      .catch(function (err) {
+        alert('Failed to fetch initial category list. The server might be down, please try again in a minute or two.')
+        console.error('something went wrong:' + err)
+      })
   }
 
   delegate('body', 'click', 'ul.dropdown li a', function (event) {
@@ -87,8 +86,8 @@
     }
     fetchSubredditPostData(thisFeedUrl())
     renderHeader(state, header)
-    // TODO: update selectedFeed with current category. Then, re-render menu.
-    // let menuHtml = renderMenu(state)
+  // TODO: update selectedFeed with current category. Then, re-render menu.
+  // let menuHtml = renderMenu(state)
   })
 
   delegate('body', 'click', '.article-content a', function (event) {
@@ -123,8 +122,8 @@
         <li><a href="#">News Source: <span>${selectedFeed}</span></a>
           <ul class="dropdown">
             ${data.feedData.map((item) => {
-              return `<li>${renderItem(item.feedTitle)}</li>`
-            }).join('')}
+      return `<li>${renderItem(item.feedTitle)}</li>`
+    }).join('')}
           </ul>
         </li>
       </ul>
@@ -159,12 +158,17 @@
     into.innerHTML = `<div id="pop-up" class="loader"></div>`
   }
 
-  function filterState (data) {
-    let filteredState = {}
   // TODO: Create a new state object, containing only the results that match the search input
   // This should run on each keyup event
   // With each keystroke build a regex query
-  console.log(data)
+  function filterState (query) {
+    let localState = state.postData
+    let filteredState = {}
+    state.postData.forEach((obj) => {
+      if (query === obj.postTitle) {
+        console.log(obj.postTitle)
+      }
+    })
   }
 
   // *** BEGIN VIEW ***
@@ -173,7 +177,7 @@
     into.innerHTML = `
     <section id="main" class="wrapper">
         ${data.map((item) => {
-          return `
+      return `
             <article class="article">
               <section class="featured-image">
                 <img src="${item.imageThumbUrl}" />
@@ -190,7 +194,7 @@
               <div class="clearfix"></div>
             </article>
             `
-        }).join('')}
+    }).join('')}
       </section>
       `
   }
