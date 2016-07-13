@@ -7,6 +7,7 @@
 'use strict'
 
 ;(function () {
+  // Set default subreddit
   let redditTopic = 'cats'
 
   const state = {}
@@ -17,7 +18,7 @@
   const imgPlaceholder = './images/r_placeholder.png'
   const subredditsByTopic = 'https://www.reddit.com/api/subreddits_by_topic.json?query=' + redditTopic
 
-  // Fetch subreddit data
+  // Fetch subreddit posts
   function fetchSubredditPostData (url) {
     renderLoading(state, container)
     if (url) {
@@ -49,7 +50,8 @@
         })
     }
   }
-  //
+
+  // Grab the initial list of categories. These are then combined with Reddit's base URL structure to form the feed URL.
   function fetchSubRedditCategories (url) {
     fetch(url)
       .then(function (response) {
@@ -63,6 +65,7 @@
           obj.feedUrl = 'https://www.reddit.com/r/' + item.name + '.json'
           return obj
         })
+        // On initial load, set the default subreddit to the first in the array
         state.feedData.selectedFeed = state.feedData[0].feedTitle
         renderHeader(state, header)
         fetchSubredditPostData(state.feedData[0].feedUrl)
@@ -73,6 +76,7 @@
       })
   }
 
+  // Menu item click event
   delegate('body', 'click', 'ul.dropdown li a', function (event) {
     var thisFeedUrl = (val) => {
       // Find relveant feed URL
@@ -86,13 +90,12 @@
     }
     fetchSubredditPostData(thisFeedUrl())
     renderHeader(state, header)
-  // TODO: update selectedFeed with current category. Then, re-render menu.
-  // let menuHtml = renderMenu(state)
   })
 
+  // Article list click event
   delegate('body', 'click', '.article-content a', function (event) {
     event.preventDefault()
-    // TODO: Try using history API to do this stuff?
+    // TODO: Try using history API or hashes to do this stuff?
     var thisId = parseInt(event.delegateTarget.dataset.id, 10)
     state.postData.forEach((obj) => {
       if (thisId === obj.postId) {
@@ -100,6 +103,7 @@
       }
     })
 
+    // Close popup
     delegate('body', 'click', '.close-pop-up', function (event) {
       event.preventDefault()
       let popup = document.querySelector('#pop-up')
@@ -110,11 +114,25 @@
   })
 
   // TODO: Search stuff
-  delegate('body', 'keyup', '#search-input', function (event) {
-    let val = event.delegateTarget.value
-    filterState(val)
-  })
+  // delegate('body', 'keyup', '#search-input', function (event) {
+  //   let val = event.delegateTarget.value
+  //   filterState(val)
+  // })
 
+  // TODO: Create a new state object, containing only the results that match the search input
+  // NOTE: This should run on each keyup event, with each keystroke build a regex query.
+  // NOTE: Combined with keyup event, the below code will log a matching title string. Just needs Regex now.
+  // function filterState (query) {
+  //   let localState = state.postData
+  //   let filteredState = {}
+  //   state.postData.forEach((obj) => {
+  //     if (query === obj.postTitle) {
+  //       console.log(obj.postTitle)
+  //     }
+  //   })
+  // }
+
+  // *** BEGIN VIEW ***
   function renderMenu (data) {
     let selectedFeed = data.feedData.selectedFeed
     return `
@@ -130,8 +148,8 @@
       `
   }
 
+  // Header template
   function renderHeader (data, into) {
-    // console.log(state)
     let menu = renderMenu(data)
     into.innerHTML = `
     <section class="wrapper">
@@ -148,30 +166,19 @@
     `
   }
 
+  // List item template
   function renderItem (item) {
     return `
         <a href="#" data-category="${item}">${item}</a>
       `
   }
 
+  // Loading template
   function renderLoading (data, into) {
     into.innerHTML = `<div id="pop-up" class="loader"></div>`
   }
 
-  // TODO: Create a new state object, containing only the results that match the search input
-  // This should run on each keyup event
-  // With each keystroke build a regex query
-  function filterState (query) {
-    let localState = state.postData
-    let filteredState = {}
-    state.postData.forEach((obj) => {
-      if (query === obj.postTitle) {
-        console.log(obj.postTitle)
-      }
-    })
-  }
-
-  // *** BEGIN VIEW ***
+  // Complete article list template
   function renderList (data, into) {
     console.log(data)
     into.innerHTML = `
@@ -198,6 +205,8 @@
       </section>
       `
   }
+
+  // Popup (article detail) template
   function renderPopup (data, into) {
     into.innerHTML = `
     <div id="pop-up">
@@ -213,7 +222,8 @@
     </div>
     `
   }
-  // init
+
+  // Initialise the page
   (() => {
     fetchSubRedditCategories(subredditsByTopic)
   })()
