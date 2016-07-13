@@ -8,19 +8,18 @@
 
 ;(function () {
 
+  let redditTopic = 'cats'
+
+  const state = {}
   const container = document.querySelector('#container')
   const popupContainer = document.querySelector('#popup-container')
   const navContainer = document.querySelector('nav')
   const header = document.querySelector('header')
   const imgPlaceholder = './images/r_placeholder.png'
-  const defaultSubreddit = 'https://www.reddit.com/r/cats.json'
+  const subredditsByTopic = 'https://www.reddit.com/api/subreddits_by_topic.json?query=' + redditTopic
 
-  var state = {}
-
-  let redditTopic = 'cats'
-
-// NOTE:Fetch subreddit urls
-  function fetchSubreddit (url) {
+// Fetch subreddit data
+  function fetchSubredditPostData (url) {
     renderLoading(state, container)
     if (url) {
       fetch(url)
@@ -37,6 +36,7 @@
             obj.score = data.score
             obj.author = data.author
             obj.postId = index
+            state.feedData.selectedFeed
             // TODO: Write a function for the below that looks for a jpg / jpeg extension in a string. The edge cases for the below could go on forever otherwise, so just look for what's needed.
             obj.imageThumbUrl = ((item.data.thumbnail === '') || (item.data.thumbnail === 'default') || (item.data.thumbnail === 'self')) ? imgPlaceholder : item.data.thumbnail
             item.data.preview ? obj.imageUrl = item.data.preview.images[0].source.url : obj.imageUrl = imgPlaceholder
@@ -45,30 +45,34 @@
           renderList(state.postData, container)
         })
         .catch((err) => {
-          console.warn('there\'s been a problem', err)
+          alert('OH NO SOMETHING BROKE')
+          console.error('there\'s been a problem', err)
         })
     }
   }
-
-  // Grab subreddit categories
-  var subredditsByTopicUrl = 'https://www.reddit.com/api/subreddits_by_topic.json?query=' + redditTopic
-  fetch(subredditsByTopicUrl)
-  .then(function (response) {
-    return response.json()
-  })
-  .then(function (json) {
-    state.feedData = []
-    state.feedData = json.map((item) => {
-      var obj = {}
-      obj.feedTitle = item.name
-      obj.feedUrl = 'https://www.reddit.com/r/' + item.name + '.json'
-      return obj
+//
+  function fetchSubRedditCategories(url) {
+    fetch(url)
+    .then(function (response) {
+      return response.json()
     })
-    renderHeader(state, header)
-  })
-  .catch(function (err) {
-    console.log('something went wrong:' + err)
-  })
+    .then(function (json) {
+      state.feedData = []
+      state.feedData = json.map((item) => {
+        var obj = {}
+        obj.feedTitle = item.name
+        obj.feedUrl = 'https://www.reddit.com/r/' + item.name + '.json'
+        return obj
+      })
+      state.feedData.selectedFeed = state.feedData[0].feedTitle
+      renderHeader(state, header)
+      fetchSubredditPostData(state.feedData[0].feedUrl)
+    })
+    .catch(function (err) {
+      alert('Failed to fetch initial category list. The server might be down, please try again in a minute or two.')
+      console.error('something went wrong:' + err)
+    })
+  }
 
   delegate('body', 'click', 'ul.dropdown li a', function (event) {
     var thisFeedUrl = (val) => {
@@ -81,9 +85,10 @@
       })
       return val
     }
-    fetchSubreddit(thisFeedUrl())
+    fetchSubredditPostData(thisFeedUrl())
+    renderHeader(state, header)
     // TODO: update selectedFeed with current category. Then, re-render menu.
-    let menuHtml = renderMenu()
+    // let menuHtml = renderMenu(state)
   })
 
   delegate('body', 'click', '.article-content a', function (event) {
@@ -108,12 +113,11 @@
   // TODO: Search stuff
   delegate('body', 'keyup', '#search-input', function (event) {
     let val = event.delegateTarget.value
-    console.log(val)
+    filterState(val)
   })
 
   function renderMenu (data) {
-    let selectedFeed = (!data.hasOwnProperty('selectedFeed')) ? 'cats' : data.feedData.selectedFeed
-    console.log("selectedFeed", selectedFeed)
+    let selectedFeed = data.feedData.selectedFeed
     return `
       <ul>
         <li><a href="#">News Source: <span>${selectedFeed}</span></a>
@@ -155,10 +159,12 @@
     into.innerHTML = `<div id="pop-up" class="loader"></div>`
   }
 
-  function filterState () {
+  function filterState (data) {
+    let filteredState = {}
   // TODO: Create a new state object, containing only the results that match the search input
   // This should run on each keyup event
   // With each keystroke build a regex query
+  console.log(data)
   }
 
   // *** BEGIN VIEW ***
@@ -203,9 +209,8 @@
     </div>
     `
   }
-
   // init
   (() => {
-    fetchSubreddit(defaultSubreddit)
+    fetchSubRedditCategories(subredditsByTopic)
   })()
 })()
