@@ -10,6 +10,7 @@
 
   const container = document.querySelector('#container')
   const popupContainer = document.querySelector('#popup-container')
+  const navContainer = document.querySelector('nav')
   const header = document.querySelector('header')
   const imgPlaceholder = './images/r_placeholder.png'
   const defaultSubreddit = 'https://www.reddit.com/r/cats.json'
@@ -111,7 +112,7 @@
   })
 
   function renderMenu (data) {
-    let selectedFeed = (!data.hasOwnProperty('selectedFeed')) ? 'All' : data.feedData.selectedFeed
+    let selectedFeed = (!data.hasOwnProperty('selectedFeed')) ? 'cats' : data.feedData.selectedFeed
     console.log("selectedFeed", selectedFeed)
     return `
       <ul>
@@ -157,6 +158,7 @@
   function filterState () {
   // TODO: Create a new state object, containing only the results that match the search input
   // This should run on each keyup event
+  // With each keystroke build a regex query
   }
 
   // *** BEGIN VIEW ***
